@@ -4,28 +4,6 @@ require 'active_model/validations'
 require 'rails/use_case/outcome'
 
 module Rails
-  # A UseCase is a class that contains high level business logic.
-  # It's used to keep controllers and models slim.
-  #
-  # The difference to a Service is that a Service contains low level
-  # non-domain code like communication with a API, generating an
-  # export, etc., while a UseCase contains high level domain logic
-  # like placing a item in the cart, submitting an order, etc.
-  #
-  # The logic of a UseCase is defined via steps. The next step is only
-  # executed when the previous ones returned a truthy value.
-  #
-  # The UseCase should assign the main record to @record. Calling save!
-  # without argument will try to save that record or raises an exception.
-  #
-  # A UseCase should raise the UseCase::Error exception for any
-  # problems.
-  #
-  # UseCase also includes ActiveModel::Validations for simple yet
-  # powerful validations. The validations are run automatically as first step.
-  #
-  # A UseCase can be called via .call(params) or .perform(params) and
-  # always returns a instance of UseCase::Outcome. params should be a hash.
   class Rails::UseCase
     include Callable
     include ActiveModel::Validations
