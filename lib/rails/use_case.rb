@@ -111,7 +111,7 @@ module Rails
         :invalid,
         message: record.errors.full_messages.join(', ')
       )
-      binding.pry
+
       raise UseCase::Error, "#{record.class.name} is not valid"
     end
 
