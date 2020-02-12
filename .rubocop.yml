@@ -1,0 +1,67 @@
+require:
+  - rubocop-rspec
+
+AllCops:
+  Include:
+    - '**/*.rb'
+  Exclude:
+    - bin/**/*
+    - tmp/**/*
+    - '*.gem'
+    - vendor/**/*
+
+Metrics/LineLength:
+  Max: 120
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/ExampleLength:
+  Enabled: false
+
+# AbcCheck makes more sense.
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+
+Naming/FileName:
+  Exclude:
+    - Gemfile
+
+Metrics/ClassLength:
+  Max: 150
+
+
+# Empty lines help to structure the code and increase readability
+Layout/EmptyLines:
+  Enabled: false
+
+Layout/EmptyLineBetweenDefs:
+  Enabled: false
+
+Layout/EmptyLinesAroundExceptionHandlingKeywords:
+  Enabled: false
+
+
+# It's nice to keep block arguments for documentation purposes
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+
+# Enforce inline access modifiers because it's more readable than group style.
+Style/AccessModifierDeclarations:
+  EnforcedStyle: inline
+
+
+MultipleExpectations:
+  Enabled: false
+
+
+Style/LambdaCall:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false

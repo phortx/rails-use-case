@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
-require 'active_model/validations'
+require 'active_model'
 require 'rails/use_case/outcome'
 
 module Rails
-  class Rails::UseCase
+  # UseCase. See README.
+  class UseCase
     include Callable
     include ActiveModel::Validations
+
+    attr_reader :record
 
     class Error < StandardError; end
 
@@ -93,17 +96,22 @@ module Rails
     # @param record [ApplicationModel] Record to save.
     # @raises [UseCase::Error] When record can't be saved.
     private def save!(record = nil)
-      record ||= @record
+      if record.nil?
+        record = @record
+        name = :record
+      else
+        name = record.model_name.singular
+      end
 
       return false unless record
       return true if record.save
 
       errors.add(
-        record.model_name.singular,
+        name,
         :invalid,
         message: record.errors.full_messages.join(', ')
       )
-
+      binding.pry
       raise UseCase::Error, "#{record.class.name} is not valid"
     end
 

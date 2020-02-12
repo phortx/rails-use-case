@@ -18,6 +18,7 @@ class Order
 
   def new_record?
     return true if @new_record.nil?
+
     @new_record
   end
 end
@@ -106,15 +107,15 @@ describe Rails::UseCase do
 
   context 'when successful' do
     it 'returns a Rails::UseCase::Outcome with success = true' do
-      expect(UseCaseTestImpl.call(order: order).success?).to be_truthy
-      expect(UseCaseTestImpl.call(order: order).failed?).to be_falsey
+      expect(UseCaseTestImpl.call(order: order)).to be_success
+      expect(UseCaseTestImpl.call(order: order)).not_to be_failed
     end
   end
 
   context 'when not successful' do
     it 'returns a Rails::UseCase::Outcome with success = false' do
-      expect(UseCaseTestImplFail.call(order: order).success?).to be_falsey
-      expect(UseCaseTestImplFail.call(order: order).failed?).to be_truthy
+      expect(UseCaseTestImplFail.call(order: order)).not_to be_success
+      expect(UseCaseTestImplFail.call(order: order)).to be_failed
     end
   end
 
@@ -157,7 +158,7 @@ describe Rails::UseCase do
 
     context 'when record not valid' do
       it 'raises a UseCase::Error' do
-        allow_any_instance_of(Order).to receive(:save).and_return(false)
+        allow(order).to receive(:save).and_return(false)
 
         use_case = nil
 

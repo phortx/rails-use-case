@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Namespace
 module Rails; end
 
 require 'rails/callable'
