@@ -31,6 +31,9 @@ save that record or raises an exception. Also the `@record` will automatically p
 
 The params should always passed as hash and are automatically assigned to instance variables.
 
+Use Cases should be placed in the `app/use_cases/` directory and the file and class name should start with a verb like `create_blog_post.rb`.
+
+
 ### Example UseCase
 
 ```ruby
@@ -81,13 +84,54 @@ puts result.inspect
 ```
 
 
+## Behavior
+
+A behavior is simply a module that contains methods to share logic between use cases and to keep them DRY.
+
+To use a behavior in a use case, use the `with` directive, like `with BlogPosts`.
+
+Behaviors should be placed in the `app/behaviors/` directory and the file and module name should named in a way it can be prefixed with `with`, like `blog_posts.rb` (with blog posts).
+
+
+### Example Behavior
+
+Definition:
+
+```ruby
+module BlogPosts
+  def notify_subscribers
+    # ... send some mails ...
+  end
+end
+```
+
+Usage:
+
+```ruby
+class CreateBlogPost < Rails::UseCase
+  with BlogPosts
+
+  # ...
+
+  step :build_post
+  step :save!
+  step :notify_subscribers, unless: -> { skip_notifications }
+
+  # ...
+end
+```
+
+
+
 ## Service
 
 The purpose of a Service is to contain low level non-domain code like communication with a API,
-generating an export, upload via FTP or generating a PDF. It takes params, has it's own configuration
-and writes a log file.
+generating an export, upload via FTP or generating a PDF. It takes params, has it's own configuration and writes a log file.
 
 It comes with call style invocation: `PDFGenerationService.(some, params)`
+
+Services should be placed in the `app/services/` directory and the name should end with `Service` like `PDFGenerationService` or `ReportUploadService`.
+
 
 ### Example Service
 

@@ -42,6 +42,13 @@ module Rails
     end
 
 
+    # DSL to include a behavior.
+    # @param mod [Module]
+    def self.with(mod)
+      include mod
+    end
+
+
     # Will run the steps of the use case.
     def process
       self.class.steps.each do |step|

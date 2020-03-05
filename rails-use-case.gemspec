@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'rails_use_case'
-  s.version     = '0.0.3'
-  s.date        = '2020-02-12'
+  s.version     = '0.0.4'
+  s.date        = '2020-04-05'
   s.summary     = 'Rails UseCase and Service classes'
   s.description = s.summary
   s.authors     = ['Benjamin Klein']

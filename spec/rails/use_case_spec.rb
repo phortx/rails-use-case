@@ -23,8 +23,17 @@ class Order
   end
 end
 
+# Test behavior
+module ExampleBehavior
+  def method_from_behavior
+    true
+  end
+end
+
 # Test implementation of the UseCase
 class UseCaseTestImpl < Rails::UseCase
+  with ExampleBehavior
+
   attr_accessor :order
 
   validates :order, presence: true
@@ -103,6 +112,10 @@ describe Rails::UseCase do
 
   it 'returns a Rails::UseCase::Outcome instance' do
     expect(UseCaseTestImpl.call(order: order)).to be_an(Rails::UseCase::Outcome)
+  end
+
+  it 'includes the behavior module' do
+    expect(UseCaseTestImpl.new).to respond_to(:method_from_behavior)
   end
 
   context 'when successful' do
