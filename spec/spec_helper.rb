@@ -6,6 +6,8 @@ $LOAD_PATH << Dir.pwd + '/lib/'
 require 'rspec'
 require 'rspec/mocks'
 require 'simplecov'
+require 'pp'
+require 'fakefs/safe'
 
 # Load all support files
 Dir['spec/support/**/*.rb'].each(&method(:require))

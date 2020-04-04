@@ -176,8 +176,9 @@ which is available via the `config` method.
 
 ### Logging
 
-The service los to a separate log file `log/services/[service_name].log`. You can write additional
-logs via `logger.info(msg)`.
+Each service automatically logs to a separate log file `log/services/[service_name].log`. You can write additional logs via `logger.info(msg)`.
+
+It's possible to force the services to log to STDOUT by setting the environment variable `SERVICE_LOGGER_STDOUT`. This is useful for Heroku for example.
 
 
 ## License

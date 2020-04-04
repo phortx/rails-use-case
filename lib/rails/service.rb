@@ -50,9 +50,29 @@ module Rails
 
     # Create the log file and sets @logger
     private def setup_logger
-      log_path = Rails.root.join('log', 'services')
-      FileUtils.mkdir_p(log_path) unless Dir.exist?(log_path)
-      @logger = Logger.new(Rails.root.join('log', 'services', "#{@service_name}.log").to_s)
+      if ENV['SERVICE_LOGGER_STDOUT']
+        setup_stdout_logger
+      else
+        log_path = Rails.root.join('log', 'services')
+        FileUtils.mkdir_p(log_path) unless Dir.exist?(log_path)
+
+        log_file = log_path.join("#{@service_name}.log").to_s
+
+        FileUtils.touch log_file
+        @logger = Logger.new(log_file)
+      end
+    end
+
+
+    # Will setup the logger for logging to STDOUT. This can be useful for
+    # Heroku for example.
+    private def setup_stdout_logger
+      @logger = Logger.new(STDOUT)
+
+      @logger.formatter = proc do |severity, datetime, progname, msg|
+        msg = "[@service_name] #{msg}"
+        original_formatter.call(severity, datetime, progname, msg.dump)
+      end
     end
 
 
