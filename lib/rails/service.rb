@@ -70,8 +70,7 @@ module Rails
       @logger = Logger.new(STDOUT)
 
       @logger.formatter = proc do |severity, datetime, progname, msg|
-        msg = "[@service_name] #{msg}"
-        original_formatter.call(severity, datetime, progname, msg.dump)
+        "[@service_name] #{msg}"
       end
     end
 
