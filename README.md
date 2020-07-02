@@ -20,7 +20,7 @@ gem 'rails_use_case'
 
 The purpose of a UseCase is to contain reusable high level business logic which would normally be
 located in the controller. It defines a process via `step` definitions. A UseCase takes params
-and has a outcome, which is successfully or failed. It doesn't have a configuration file and doesn't
+and has a outcome, which is either successful or failed. It doesn't have a configuration file and doesn't
 log anything. Examples are: Place an item in the cart, create a new user or delete a comment.
 
 Steps are executed in the defined order. Only when a step succeeds (returns true) the next step will
