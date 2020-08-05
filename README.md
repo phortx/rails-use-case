@@ -1,6 +1,8 @@
 # Rails Use Case gem
 
-Opinionated gem for UseCases and Services in rails to keep models and controllers slim.
+Opinionated gem for UseCases and Services in Rails to keep your Models and Controllers slim.
+
+Read more: https://dev.to/phortx/pimp-your-rails-application-32d0
 
 The purpose of a UseCase is to contain reusable high level business logic which would normally be
 located in the controller. Examples are: Place an item in the cart, create a new user or delete a comment.
@@ -82,6 +84,11 @@ puts result.inspect
 #   error: nil
 # }
 ```
+
+- You can check whether a UseCase was successful via `result.success?`.
+- You can access the value of `@record` via `result.record`.
+- You can stop the UseCase process with a error message via throwing `Rails::UseCase::Error` exception.
+
 
 
 ## Behavior
