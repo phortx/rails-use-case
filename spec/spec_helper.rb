@@ -10,7 +10,7 @@ require 'pp'
 require 'fakefs/safe'
 
 # Load all support files
-Dir['spec/support/**/*.rb'].each(&method(:require))
+Dir['spec/support/**/*.rb'].sort.each(&method(:require))
 
 SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter]
 
