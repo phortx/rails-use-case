@@ -8,8 +8,8 @@ module Rails
     extend ActiveSupport::Concern
 
     class_methods do
-      def call(*args)
-        new.call(*args)
+      def call(...)
+        new.call(...)
       end
 
       alias_method :perform, :call

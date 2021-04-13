@@ -121,8 +121,8 @@ module Rails
 
 
     # Allows call syntax on class level: SomeService.(some, args)
-    def self.call(*args)
-      new.(*args)
+    def self.call(...)
+      new.(...)
     end
 
     # Allows to use rails view helpers
