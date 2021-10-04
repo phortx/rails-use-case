@@ -100,6 +100,34 @@ class UseCaseTestImplSkipUnless < Rails::UseCase
   end
 end
 
+# Test implementation of the UseCase which uses succeed
+class UseCaseTestImplSuccess < Rails::UseCase
+  attr_accessor :order
+
+  validates :order, presence: true
+
+  success
+  step :do_things
+
+  def do_things
+    raise "You shouldn't have did that!"
+  end
+end
+
+# Test implementation of the UseCase which uses failure
+class UseCaseTestImplFailure < Rails::UseCase
+  attr_accessor :order
+
+  validates :order, presence: true
+
+  failure message: 'test'
+  step :do_things
+
+  def do_things
+    raise "You shouldn't have did that!"
+  end
+end
+
 describe Rails::UseCase do
   let(:order) { Order.new }
 
@@ -149,6 +177,20 @@ describe Rails::UseCase do
 
     UseCaseTestImplSkipIf.call(order: order)
     UseCaseTestImplSkipUnless.call(order: order)
+  end
+
+  it 'can have a success step' do
+    expect_any_instance_of(UseCaseTestImplSuccess).not_to \
+      receive(:do_things)
+
+    expect(UseCaseTestImplSuccess.call(order: order)).to be_success
+  end
+
+  it 'can have a failure step' do
+    expect_any_instance_of(UseCaseTestImplFailure).not_to \
+      receive(:do_things)
+
+    expect(UseCaseTestImplFailure.call(order: order)).to be_failed
   end
 
   describe '#break_when_invalid!' do

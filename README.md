@@ -36,6 +36,11 @@ You can also have named inline steps: `step :foo, do: -> { ... }` which is
 equivalent to `step { ... }` but with a given name. An existing method `foo`
 will not be called in this case but rather the block be executed.
 
+There are also two special steps: `success` and `failure`. Both will end the
+step chain immediately. `success` will end the use case successfully (like there
+would be no more steps). And `failure` respectively will end the use case with a
+error. You should pass the error message via `message:` option.
+
 The UseCase should assign the main record to `@record`. Calling save! without argument will try to
 save that record or raises an exception. Also the `@record` will automatically passed into the outcome.
 
@@ -48,14 +53,16 @@ Use Cases should be placed in the `app/use_cases/` directory and the file and cl
 
 ```ruby
 class CreateBlogPost < Rails::UseCase
-  attr_accessor :title, :content, :author, :skip_notifications
+  attr_accessor :title, :content, :author, :skip_notifications, :publish
 
   validates :title, presence: true
   validates :content, presence: true
   validates :author, presence: true
 
+  failure message: 'No permission', unless: -> { author.can_publish_blog_posts? }
   step :build_post
   step :save!
+  succeed unless: -> { publish }
   step { record.publish! }
   step :notify_subscribers, unless: -> { skip_notifications }
 

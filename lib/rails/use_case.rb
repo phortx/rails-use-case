@@ -49,6 +49,16 @@ module Rails
     end
 
 
+    def self.success(options = {})
+      step :success, options
+    end
+
+
+    def self.failure(options = {})
+      step :failure, options
+    end
+
+
     # DSL to include a behavior.
     # @param mod [Module]
     def self.with(mod)
@@ -62,13 +72,26 @@ module Rails
         # Check wether to skip when :if or :unless are set.
         next if skip_step?(step)
 
+        name = step[:name]
+
+        # Handle failure and success steps.
+        return true if name == :success
+
+        fail_use_case(step[:options][:message]) if name == :failure
+
         # Run the lambda, when :do is set. Otherwise call the method.
         inline_fn = step[:options][:do]
-        result = inline_fn ? instance_eval(&inline_fn) : send(step[:name])
+        result = inline_fn ? instance_eval(&inline_fn) : send(name)
         next if result
 
-        raise UseCase::Error, "Step #{step[:name]} returned false"
+        # result is false, so we have a failure.
+        fail_use_case "Step #{name} returned false"
       end
+    end
+
+
+    private def fail_use_case(message = 'Failed')
+      raise UseCase::Error, message
     end
 
 
