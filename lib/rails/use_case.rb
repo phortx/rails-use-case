@@ -34,10 +34,17 @@ module Rails
     # DSL to define a process step of the UseCase.
     # You can use if/unless with a lambda in the options
     # to conditionally skip the step.
+    #
     # @param name [Symbol]
     # @param options [Hash]
-    def self.step(name, options = {})
+    def self.step(name = :inline, options = {}, &block)
       @steps ||= []
+
+      if block_given?
+        options[:do] = block
+        name = :inline
+      end
+
       @steps << { name: name.to_sym, options: options }
     end
 
@@ -52,8 +59,13 @@ module Rails
     # Will run the steps of the use case.
     def process
       self.class.steps.each do |step|
+        # Check wether to skip when :if or :unless are set.
         next if skip_step?(step)
-        next if send(step[:name])
+
+        # Run the lambda, when :do is set. Otherwise call the method.
+        inline_fn = step[:options][:do]
+        result = inline_fn ? instance_eval(&inline_fn) : send(step[:name])
+        next if result
 
         raise UseCase::Error, "Step #{step[:name]} returned false"
       end
