@@ -21,6 +21,10 @@ class Order
 
     @new_record
   end
+
+  def bar
+    true
+  end
 end
 
 # Test behavior
@@ -39,6 +43,7 @@ class UseCaseTestImpl < Rails::UseCase
   validates :order, presence: true
 
   step :do_things
+  step { record.bar }
 
   def do_things
     @record = order
@@ -106,6 +111,9 @@ describe Rails::UseCase do
   it 'runs the steps' do
     expect_any_instance_of(UseCaseTestImpl).to \
       receive(:do_things).and_call_original
+
+    expect_any_instance_of(Order).to \
+      receive(:bar).and_call_original
 
     UseCaseTestImpl.call order: order
   end

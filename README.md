@@ -28,6 +28,14 @@ log anything. Examples are: Place an item in the cart, create a new user or dele
 Steps are executed in the defined order. Only when a step succeeds (returns true) the next step will
 be executed. Steps can be skipped via `if` and `unless`.
 
+The step either provides the name of a method within the use case or a block.
+When a block is given, it will be executed. Otherwise the framework will try to
+call a method with the given name.
+
+You can also have named inline steps: `step :foo, do: -> { ... }` which is
+equivalent to `step { ... }` but with a given name. An existing method `foo`
+will not be called in this case but rather the block be executed.
+
 The UseCase should assign the main record to `@record`. Calling save! without argument will try to
 save that record or raises an exception. Also the `@record` will automatically passed into the outcome.
 
@@ -48,6 +56,7 @@ class CreateBlogPost < Rails::UseCase
 
   step :build_post
   step :save!
+  step { record.publish! }
   step :notify_subscribers, unless: -> { skip_notifications }
 
 
