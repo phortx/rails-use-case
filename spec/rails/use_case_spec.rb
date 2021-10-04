@@ -4,6 +4,8 @@ require 'spec_helper'
 require 'active_model'
 require 'rails_use_case'
 
+# TODO: code for failure step
+
 # A example model
 class Order
   include ActiveModel::Model
@@ -50,7 +52,7 @@ class UseCaseTestImpl < Rails::UseCase
   end
 end
 
-# Test implementation of the UseCase which fails
+# Test implementation of the UseCase which fails via falsy steps
 class UseCaseTestImplFail < Rails::UseCase
   attr_accessor :order
 
@@ -61,6 +63,21 @@ class UseCaseTestImplFail < Rails::UseCase
   def do_things
     @record = order
     false
+  end
+end
+
+
+# Test implementation of the UseCase which fails via fail!
+class UseCaseTestImplFail2 < Rails::UseCase
+  attr_accessor :order
+
+  validates :order, presence: true
+
+  step :do_things
+
+  def do_things
+    @record = order
+    fail! code: :foobar, message: 'Something went wrong'
   end
 end
 
@@ -120,7 +137,7 @@ class UseCaseTestImplFailure < Rails::UseCase
 
   validates :order, presence: true
 
-  failure message: 'test'
+  failure :foobar, message: 'test'
   step :do_things
 
   def do_things
@@ -163,8 +180,23 @@ describe Rails::UseCase do
 
   context 'when not successful' do
     it 'returns a Rails::UseCase::Outcome with success = false' do
-      expect(UseCaseTestImplFail.call(order: order)).not_to be_success
-      expect(UseCaseTestImplFail.call(order: order)).to be_failed
+      outcome = UseCaseTestImplFail.call(order: order)
+      expect(outcome).to be_failed
+
+      expect(outcome.code).to eq(:step_false)
+      expect(outcome.message).to eq("Step 'do_things' returned false")
+
+      expect(outcome.exception).to be_a(Rails::UseCase::Error)
+    end
+
+    it 'allows to set code and message' do
+      outcome = UseCaseTestImplFail2.call(order: order)
+      expect(outcome).to be_failed
+
+      expect(outcome.code).to eq(:foobar)
+      expect(outcome.message).to eq('Something went wrong')
+
+      expect(outcome.exception).to be_a(Rails::UseCase::Error)
     end
   end
 
@@ -190,7 +222,14 @@ describe Rails::UseCase do
     expect_any_instance_of(UseCaseTestImplFailure).not_to \
       receive(:do_things)
 
-    expect(UseCaseTestImplFailure.call(order: order)).to be_failed
+    outcome = UseCaseTestImplFailure.call(order: order)
+
+    expect(outcome).to be_failed
+
+    expect(outcome.code).to eq(:foobar)
+    expect(outcome.message).to eq('test')
+
+    expect(outcome.exception).to be_a(Rails::UseCase::Error)
   end
 
   describe '#break_when_invalid!' do

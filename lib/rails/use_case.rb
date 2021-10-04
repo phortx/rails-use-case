@@ -54,7 +54,8 @@ module Rails
     end
 
 
-    def self.failure(options = {})
+    def self.failure(code = nil, options = {})
+      options[:code] = code || options[:code] || :failure
       step :failure, options
     end
 
@@ -72,25 +73,25 @@ module Rails
         # Check wether to skip when :if or :unless are set.
         next if skip_step?(step)
 
+        opts = step[:options]
         name = step[:name]
 
         # Handle failure and success steps.
         return true if name == :success
 
-        fail_use_case(step[:options][:message]) if name == :failure
+        fail!(code: opts[:code], message: opts[:message]) if name == :failure
 
         # Run the lambda, when :do is set. Otherwise call the method.
-        inline_fn = step[:options][:do]
-        result = inline_fn ? instance_eval(&inline_fn) : send(name)
-        next if result
+        next if opts[:do] ? instance_eval(&opts[:do]) : send(name)
 
         # result is false, so we have a failure.
-        fail_use_case "Step #{name} returned false"
+        fail! code: :step_false, message: "Step '#{name}' returned false"
       end
     end
 
 
-    private def fail_use_case(message = 'Failed')
+    def fail!(code: nil, message: 'Failed')
+      @error_code = code
       raise UseCase::Error, message
     end
 
@@ -128,7 +129,7 @@ module Rails
     def break_when_invalid!
       return true if valid?
 
-      raise UseCase::Error, errors.full_messages.join(', ')
+      fail! code: :validation_failed, message: errors.full_messages.join(', ')
     end
 
 
@@ -154,7 +155,7 @@ module Rails
         message: record.errors.full_messages.join(', ')
       )
 
-      raise UseCase::Error, "#{record.class.name} is not valid"
+      fail! code: :save_failed, message: errors.full_messages.join(', ')
     end
 
 
@@ -175,7 +176,9 @@ module Rails
         success: false,
         record: @record,
         errors: errors,
-        exception: error
+        exception: error,
+        message: error.message,
+        code: @error_code
       )
     end
   end
