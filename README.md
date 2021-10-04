@@ -25,6 +25,13 @@ located in the controller. It defines a process via `step` definitions. A UseCas
 and has a outcome, which is either successful or failed. It doesn't have a configuration file and doesn't
 log anything. Examples are: Place an item in the cart, create a new user or delete a comment.
 
+The params should always passed as hash and are automatically assigned to instance variables.
+
+Use Cases should be placed in the `app/use_cases/` directory and the file and class name should start with a verb like `create_blog_post.rb`.
+
+
+### Steps
+
 Steps are executed in the defined order. Only when a step succeeds (returns true) the next step will
 be executed. Steps can be skipped via `if` and `unless`.
 
@@ -39,14 +46,29 @@ will not be called in this case but rather the block be executed.
 There are also two special steps: `success` and `failure`. Both will end the
 step chain immediately. `success` will end the use case successfully (like there
 would be no more steps). And `failure` respectively will end the use case with a
-error. You should pass the error message via `message:` option.
+error. You should pass the error message and/or code via `message:` and/or
+`code:` options.
 
-The UseCase should assign the main record to `@record`. Calling save! without argument will try to
+
+### Failing
+
+A UseCase fails when a step returns a falsy value or raises an exception.
+
+For even better error handling, you should let a UseCase fail via the shortcut
+`fail!()` which actually just raised an `UseCase::Error` but you can provide
+some additional information. This way you can provide a human readable message
+with error details and additionally you can pass an error code as symbol, which
+allows the calling code to do error handling:
+
+`fail!(message: 'You have called this wrong. Shame on you!', code: :missing_information)`.
+
+The error_code can also passed as first argument to the `failure` step definition.
+
+
+### Record
+
+The UseCase should assign the main record to `@record`. Calling `save!` without argument will try to
 save that record or raises an exception. Also the `@record` will automatically passed into the outcome.
-
-The params should always passed as hash and are automatically assigned to instance variables.
-
-Use Cases should be placed in the `app/use_cases/` directory and the file and class name should start with a verb like `create_blog_post.rb`.
 
 
 ### Example UseCase
@@ -59,12 +81,12 @@ class CreateBlogPost < Rails::UseCase
   validates :content, presence: true
   validates :author, presence: true
 
-  failure message: 'No permission', unless: -> { author.can_publish_blog_posts? }
-  step :build_post
-  step :save!
+  failure :access_denied, message: 'No permission', unless: -> { author.can_publish_blog_posts? }
+  step    :build_post
+  step    :save!
   succeed unless: -> { publish }
-  step { record.publish! }
-  step :notify_subscribers, unless: -> { skip_notifications }
+  step    :publish, do: -> { record.publish! }
+  step    :notify_subscribers, unless: -> { skip_notifications }
 
 
   private def build_post
@@ -93,12 +115,14 @@ result = CreateBlogPost.perform(
 )
 
 puts result.inspect
-# => {
-#   success: true,
-#   record: BlogPost(...)
-#   errors: [],
-#   error: nil
-# }
+=> {
+  success: false,                        # Wether the UseCase ended successfully
+  record: BlogPost(...)                  # The value assigned to @record
+  errors: [],                            # List of validation errors
+  exception: Rails::UseCase::Error(...), # The exception raised by the UseCase
+  message: "...",                        # Error message
+  error_code: :save_failed               # Error Code
+}
 ```
 
 - You can check whether a UseCase was successful via `result.success?`.
