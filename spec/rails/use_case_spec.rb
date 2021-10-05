@@ -4,8 +4,6 @@ require 'spec_helper'
 require 'active_model'
 require 'rails_use_case'
 
-# TODO: code for failure step
-
 # A example model
 class Order
   include ActiveModel::Model
@@ -173,8 +171,10 @@ describe Rails::UseCase do
 
   context 'when successful' do
     it 'returns a Rails::UseCase::Outcome with success = true' do
-      expect(UseCaseTestImpl.call(order: order)).to be_success
-      expect(UseCaseTestImpl.call(order: order)).not_to be_failed
+      outcome = UseCaseTestImpl.call(order: order)
+      expect(outcome).to be_success
+      expect(outcome).not_to be_failed
+      expect(outcome.code).to eq(:success)
     end
   end
 

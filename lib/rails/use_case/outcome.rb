@@ -23,7 +23,7 @@ module Rails
         @record = record
         @exception = exception
         @message = message || exception&.message || errors&.full_messages
-        @code = code&.to_sym
+        @code = success ? :success : code&.to_sym
       end
       # rubocop:enable Metrics/ParameterLists
 

@@ -74,7 +74,7 @@ save that record or raises an exception. Also the `@record` will automatically p
 ### Example UseCase
 
 ```ruby
-class CreateBlogPost < Rails::UseCase
+class BlogPosts::Create < Rails::UseCase
   attr_accessor :title, :content, :author, :skip_notifications, :publish
 
   validates :title, presence: true
@@ -107,10 +107,10 @@ end
 Example usage of that UseCase:
 
 ```ruby
-result = CreateBlogPost.perform(
+result = BlogPosts::Create.perform(
   title: 'Super Awesome Stuff!',
   content: 'Lorem Ipsum Dolor Sit Amet',
-  created_by: current_user,
+  author: current_user,
   skip_notifications: false
 )
 
@@ -129,6 +129,44 @@ puts result.inspect
 - You can access the value of `@record` via `result.record`.
 - You can stop the UseCase process with a error message via throwing `Rails::UseCase::Error` exception.
 
+
+### Working with the result
+
+The `perform` method of a UseCase returns an outcome object which contains a
+`code` field with the error code or `:success` otherwise. This comes handy when
+using in controller actions for example and is a great way to delegate the
+business logic part of a controller action to the respective UseCase.
+Everything the controller has to do, is to setup the params and dispatch the
+result.
+
+Given the Example above, here is the same call within a controller action with
+an case statement.
+
+```ruby
+class BlogPostsController < ApplicationController
+  # ...
+
+  def create
+    parameters = {
+      title: params[:post][:title],
+      content: params[:post][:content],
+      publish: params[:post][:publish],
+      author: current_user
+    }
+
+    case BlogPosts::Create.perform(parameters).code
+    when :success       then redirect_to(outcome.record)
+    when :access_denied then render(:new, flash: { error: "Access Denied!" })
+    when :foo           then redirect_to('/')
+    else                     render(:new, flash: { error: outcome.message })
+    end
+  end
+
+  # ...
+end
+```
+
+However this is not rails specific and can be used in any context.
 
 
 ## Behavior
