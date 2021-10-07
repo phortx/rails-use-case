@@ -42,11 +42,13 @@ class UseCaseTestImpl < Rails::UseCase
 
   validates :order, presence: true
 
+  record :order
+
   step :do_things
   step { record.bar }
 
   def do_things
-    @record = order
+    true
   end
 end
 
@@ -108,6 +110,8 @@ class UseCaseTestImplSkipUnless < Rails::UseCase
 
   def do_things
     @record = order
+
+    record.bar
   end
 
   def dont_do_this
@@ -120,6 +124,8 @@ class UseCaseTestImplSuccess < Rails::UseCase
   attr_accessor :order
 
   validates :order, presence: true
+
+  record { 42 }
 
   success
   step :do_things
@@ -216,6 +222,18 @@ describe Rails::UseCase do
       receive(:do_things)
 
     expect(UseCaseTestImplSuccess.call(order: order)).to be_success
+  end
+
+  it 'can have a record definition with a symbol' do
+    outcome = UseCaseTestImpl.call(order: order)
+    expect(outcome).to be_success
+    expect(outcome.record).to eq(order)
+  end
+
+  it 'can have a record definition with a block' do
+    outcome = UseCaseTestImplSuccess.call(order: order)
+    expect(outcome).to be_success
+    expect(outcome.record).to eq(42)
   end
 
   it 'can have a failure step' do

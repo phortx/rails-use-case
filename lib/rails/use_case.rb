@@ -67,8 +67,24 @@ module Rails
     end
 
 
+    # DSL to set the record source.
+    # @param [Symbol|nil] Name of the param.
+    # @yields
+    def self.record(param = nil, &block)
+      block = -> { send(param.to_sym) } unless block_given?
+
+      define_method(:determine_record, &block)
+    end
+
+
     # Will run the steps of the use case.
     def process
+      @record = determine_record if respond_to?(:determine_record)
+      run_steps
+    end
+
+
+    def run_steps
       self.class.steps.each do |step|
         # Check wether to skip when :if or :unless are set.
         next if skip_step?(step)

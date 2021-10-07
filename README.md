@@ -67,8 +67,19 @@ The error_code can also passed as first argument to the `failure` step definitio
 
 ### Record
 
-The UseCase should assign the main record to `@record`. Calling `save!` without argument will try to
-save that record or raises an exception. Also the `@record` will automatically passed into the outcome.
+The UseCase should assign the main record to `@record`. Calling `save!` without
+argument will try to save that record or raises an exception. Also the
+`@record` will automatically passed into the outcome.
+
+You can either set the `@record` manually or via the `record` method. This comes
+in two flavors:
+
+Either passing the name of a param as symbol. Let's assume the UseCase
+has a parameter called `user` (defined via `attr_accessor`), then you can assign
+the user to `@record` by adding `record :user` to your use case.
+
+The alternative way is to pass a block which returns the value for `@record`
+like in the example UseCase below.
 
 
 ### Example UseCase
@@ -81,16 +92,18 @@ class BlogPosts::Create < Rails::UseCase
   validates :content, presence: true
   validates :author, presence: true
 
+  record { BlogPost.new }
+
   failure :access_denied, message: 'No permission', unless: -> { author.can_publish_blog_posts? }
-  step    :build_post
+  step    :assign_attributes
   step    :save!
   succeed unless: -> { publish }
   step    :publish, do: -> { record.publish! }
   step    :notify_subscribers, unless: -> { skip_notifications }
 
 
-  private def build_post
-    @record = BlogPost.new(
+  private def assign_attributes
+    @record.assign_attributes(
       title: title,
       content: content,
       created_by: author,
