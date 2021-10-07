@@ -154,7 +154,9 @@ class BlogPostsController < ApplicationController
       author: current_user
     }
 
-    case BlogPosts::Create.perform(parameters).code
+    outcome = BlogPosts::Create.perform(parameters).code
+
+    case outcome.code
     when :success       then redirect_to(outcome.record)
     when :access_denied then render(:new, flash: { error: "Access Denied!" })
     when :foo           then redirect_to('/')
