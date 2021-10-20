@@ -1,11 +1,13 @@
 # Rails Use Case gem
 
-Opinionated gem for UseCases and Services in Rails to keep your Models and Controllers slim.
+This gem introduces UseCases and Services to Rails which allow you to keep your Models and Controllers slim.
 
 Read more: https://dev.to/phortx/pimp-your-rails-application-32d0
 
-The purpose of a UseCase is to contain reusable high level business logic which would normally be
-located in the controller. Examples are: Place an item in the cart, create a new user or delete a comment.
+Clean Architecture suggests to put the business logic in UseCases which are classes, that contain reusable high
+level business logic which otherwise would normally be located in the controller. UseCases are easy to read,
+clean, reusable, testable and extendable.
+Examples are: Place an item in the cart, create a new user or delete a comment.
 
 The purpose of a Service is to contain low level non-domain code like communication with a API,
 generating an export, upload via FTP or generating a PDF.
