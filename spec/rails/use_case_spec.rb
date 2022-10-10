@@ -9,6 +9,7 @@ class Order
   include ActiveModel::Model
 
   attr_accessor :payment_type
+
   validates_presence_of :payment_type
 
   def save

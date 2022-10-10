@@ -38,7 +38,7 @@ module Rails
     #
     # @raise [RuntimeError] When no service_name is given
     def initialize(service_name = nil)
-      raise NotImplementedError if self.class == Service
+      raise NotImplementedError if instance_of?(Service)
       raise 'Please provide a service name!' if service_name.nil?
 
       @service_name = service_name
@@ -67,7 +67,7 @@ module Rails
     # Will setup the logger for logging to STDOUT. This can be useful for
     # Heroku for example.
     private def setup_stdout_logger
-      @logger = Logger.new(STDOUT)
+      @logger = Logger.new($stdout)
 
       @logger.formatter = proc do |severity, datetime, progname, msg|
         "[#{@service_name}] #{msg}"

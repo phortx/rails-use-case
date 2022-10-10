@@ -50,7 +50,7 @@ describe Rails::Service do
 
         allow(Logger).to receive(:new).and_call_original
         TestService.call something: 1
-        expect(Logger).to have_received(:new).with(STDOUT)
+        expect(Logger).to have_received(:new).with($stdout)
 
         ENV['SERVICE_LOGGER_STDOUT'] = nil
       end
