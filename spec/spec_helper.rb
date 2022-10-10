@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Extend loadpath for simpler require statements
-$LOAD_PATH << Dir.pwd + '/lib/'
+$LOAD_PATH << "#{Dir.pwd}/lib/"
 
 require 'rspec'
 require 'rspec/mocks'
