@@ -98,7 +98,7 @@ module Rails
         fail!(code: opts[:code], message: opts[:message]) if name == :failure
 
         # Run the lambda, when :do is set. Otherwise call the method.
-        next if opts[:do] ? instance_eval(&opts[:do]) : send(name)
+        next if opts[:do] ? instance_exec(&opts[:do]) : send(name)
 
         # result is false, so we have a failure.
         fail! code: :step_false, message: "Step '#{name}' returned false"

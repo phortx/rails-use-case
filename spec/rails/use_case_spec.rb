@@ -26,6 +26,10 @@ class Order
   def bar
     true
   end
+
+  def foo
+    true
+  end
 end
 
 # Test behavior
@@ -46,6 +50,7 @@ class UseCaseTestImpl < Rails::UseCase
   record :order
 
   step :do_things
+  step :something, do: -> { record.foo }
   step { record.bar }
 
   def do_things
@@ -164,6 +169,9 @@ describe Rails::UseCase do
 
     expect_any_instance_of(Order).to \
       receive(:bar).and_call_original
+
+    expect_any_instance_of(Order).to \
+      receive(:foo).and_call_original
 
     UseCaseTestImpl.call order: order
   end
