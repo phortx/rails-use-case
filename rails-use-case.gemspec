@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.files = Dir['lib/**/*', 'README.md']
 
   s.add_dependency 'activemodel', '>= 6.1.3'
-  s.add_dependency 'railties', '>= 6.1.3'
 
   s.add_development_dependency 'bundler-audit', '~> 0.6'
   s.add_development_dependency 'fakefs', '~> 1.2.0'
