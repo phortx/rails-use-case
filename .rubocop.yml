@@ -1,9 +1,10 @@
-require:
+plugins:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.3
   NewCops: enable
+  SuggestExtensions: false
   Include:
     - '**/*.rb'
   Exclude:
@@ -12,7 +13,7 @@ AllCops:
     - '*.gem'
     - vendor/**/*
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 RSpec/NestedGroups:
@@ -58,7 +59,7 @@ Style/AccessModifierDeclarations:
   EnforcedStyle: inline
 
 
-MultipleExpectations:
+RSpec/MultipleExpectations:
   Enabled: false
 
 
@@ -67,3 +68,13 @@ Style/LambdaCall:
 
 RSpec/AnyInstance:
   Enabled: false
+
+# Spec files intentionally define multiple helper classes per file
+Style/OneClassPerFile:
+  Exclude:
+    - spec/**/*
+
+# Spec helper methods use descriptive names that don't follow predicate conventions
+Naming/PredicateMethod:
+  Exclude:
+    - spec/**/*

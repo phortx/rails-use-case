@@ -272,7 +272,7 @@ describe Rails::UseCase do
       it 'returns true' do
         use_case = UseCaseTestImpl.new
         use_case.order = order
-        expect(use_case.break_when_invalid!).to eq(true)
+        expect(use_case.break_when_invalid!).to be(true)
       end
     end
   end

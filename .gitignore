@@ -34,3 +34,5 @@
 .rvmrc
 
 .idea
+
+.claude/settings.local.json

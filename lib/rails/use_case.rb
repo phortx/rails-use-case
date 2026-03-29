@@ -125,7 +125,7 @@ module Rails
 
       proc = step[:options][:unless]
       result = instance_exec(&proc)
-      return true if result
+      true if result
     end
 
 

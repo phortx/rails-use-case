@@ -54,7 +54,7 @@ module Rails
         setup_stdout_logger
       else
         log_path = Rails.root.join('log', 'services')
-        FileUtils.mkdir_p(log_path) unless Dir.exist?(log_path)
+        FileUtils.mkdir_p(log_path)
 
         log_file = log_path.join("#{@service_name}.log").to_s
 
@@ -103,15 +103,24 @@ module Rails
     end
 
 
-    # Convenience method to get a secret. It looks for the key `services.<service_name>.<key>`
+    # Convenience method to get a secret.
+    # Looks for the key `services.<service_name>.<key>` in Rails credentials.
+    # Falls back to secrets.yml (deprecated since Rails 7.2) with a warning.
     private def secret(key)
       key = key.to_sym
-      base = Rails.application.secrets.services[@service_name.to_sym]
+      value = Rails.application.credentials.dig(:services, @service_name.to_sym, key)
 
-      raise "No secrets entry found for 'services.#{@service_name}'" unless base
-      raise "No secrets entry found for 'services.#{@service_name}.#{key}'" unless base[key]
+      return value unless value.nil?
 
-      base[key]
+      # Fallback to legacy secrets.yml (deprecated in Rails 7.2)
+      if Rails.application.respond_to?(:secrets)
+        warn '[rails_use_case] DEPRECATION: Rails.application.secrets is deprecated. ' \
+             "Migrate 'services.#{@service_name}.#{key}' to Rails credentials."
+        base = Rails.application.secrets.dig(:services, @service_name.to_sym)
+        return base[key] if base&.[](key)
+      end
+
+      raise "No credentials entry found for 'services.#{@service_name}.#{key}'"
     end
 
 

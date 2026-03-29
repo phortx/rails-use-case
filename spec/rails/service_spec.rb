@@ -9,7 +9,7 @@ class TestService < Rails::Service
   attr_accessor :something
 
   def initialize
-    super 'test'
+    super('test')
   end
 
   def call(something:)
